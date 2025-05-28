@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -8,8 +9,268 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum USER_ROLE {
+  GOD
+  ADMIN
+  ATHLETE
+  ADMINFEDERATION
+  ADMINTEAM
+}
+
+enum USER_STATUS {
+  ACTIVE
+  INACTIVE
+  PENDING
+  BLOCKED
+}
+
+enum TECHNICIAN_TYPE {
+  OFFICIAL
+  COMMITTEE
+}
+
+enum STATUS {
+  APPROVED
+  PENDING
+  REJECTED
+}
+
+model Credential {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  user      User?
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("credentials")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("sessions")
+}
+
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id            String        @id
+  email         String        @unique
+  name          String
+  role          USER_ROLE
+  status        USER_STATUS   @default(ACTIVE)
+  isTransfering Boolean       @default(false)
+  photoUrl      String?
+  teamId        String?
+  federationId  String?
+  birthDate     DateTime?     @db.Date
+  document      String?       @unique
+  team          Team?         @relation(fields: [teamId], references: [id])
+  federation    Federation?   @relation(fields: [federationId], references: [id])
+  athlete       Athlete?
+  approval      UserApproval?
+  sessions      Session[]
+  credential    Credential?   @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  updatedAt     DateTime      @default(now()) @updatedAt
+  createdAt     DateTime      @default(now())
+
+  @@map("users")
+}
+
+model Athlete {
+  id                 String    @id @default(uuid())
+  registerNumber     String
+  birthDate          DateTime?
+  phone              String?
+  nickname           String?
+  gender             String?
+  emergencyName      String?
+  emergencyPhone     String?
+  rgNumber           String?
+  rgEmissionDate     DateTime?
+  rgEmissionOrg      String?
+  personalDocument   String?
+  noc                String?
+  medicalCertificate String?
+  commitmentTerm     String?
+  bloodType          String?
+  allergies          String?
+  chronicDiseases    String?
+  medications        String?
+  country            String?
+  termsAccepted      Boolean   @default(false)
+  dataUseAccepted    Boolean   @default(false)
+  imageUseAccepted   Boolean   @default(false)
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id])
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+  address            Address?
+
+  @@map("athletes")
+}
+
+model Address {
+  id               String          @id @default(uuid())
+  country          String?
+  city             String?
+  uf               String?
+  code             String?
+  street           String?
+  number           String?
+  complement       String?
+  athleteId        String?         @unique
+  athlete          Athlete?        @relation(fields: [athleteId], references: [id])
+  partnerProjectId String?         @unique
+  partnerProject   PartnerProject? @relation(fields: [partnerProjectId], references: [id])
+  updatedAt        DateTime        @default(now()) @updatedAt
+  createdAt        DateTime        @default(now())
+
+  @@map("addresses")
+}
+
+model Federation {
+  id                            String           @id @default(uuid())
+  name                          String?
+  initials                      String?
+  uf                            String?          @db.VarChar(2)
+  email                         String?
+  presidentName                 String?
+  beginningOfTerm               DateTime?        @db.Date
+  endOfTerm                     DateTime?        @db.Date
+  electionMinutes               String?
+  presidentDocument             String?
+  federationDocument            String?
+  logo                          String?
+  teams                         Team[]
+  updatedAt                     DateTime         @default(now()) @updatedAt
+  createdAt                     DateTime         @default(now())
+  users                         User[]
+  partnerProjects               PartnerProject[]
+  userApprovals                 UserApproval[]
+  currentFederationTransfer     Transfer[]       @relation("current_federation")
+  destinationFederationTransfer Transfer[]       @relation("destination_federation")
+
+  @@map("federations")
+}
+
+model Team {
+  id                      String           @id @default(uuid())
+  name                    String?
+  initials                String?
+  description             String?
+  url                     String?
+  coachName               String?
+  email                   String?
+  presidentName           String?
+  beginningOfTerm         DateTime?
+  endOfTerm               DateTime?
+  electionMinutes         String?
+  presidentDocument       String?
+  teamDocument            String?
+  logo                    String?
+  federationId            String
+  federation              Federation       @relation(fields: [federationId], references: [id])
+  technicians             Technician[]
+  partnerProjects         PartnerProject[]
+  users                   User[]
+  updatedAt               DateTime         @default(now()) @updatedAt
+  createdAt               DateTime         @default(now())
+  userApprovals           UserApproval[]
+  currentTeamTransfer     Transfer[]       @relation("current_team")
+  destinationTeamTransfer Transfer[]       @relation("destination_team")
+
+  @@map("teams")
+}
+
+model Technician {
+  id           String          @id @default(uuid())
+  name         String
+  phone        String
+  charge       String?
+  birthDate    String
+  gender       String
+  email        String
+  document     String
+  documentFile String
+  type         TECHNICIAN_TYPE
+  teamId       String?
+  team         Team?           @relation(fields: [teamId], references: [id])
+  updatedAt    DateTime        @default(now()) @updatedAt
+  createdAt    DateTime        @default(now())
+
+  @@map("technicians")
+}
+
+model PartnerProject {
+  id                  String      @id @default(uuid())
+  name                String
+  description         String
+  initialDate         DateTime?
+  finalDate           DateTime?
+  practitioners       Int
+  malePractitioners   Int
+  femalePractitioners Int
+  ageGroup            String
+  contactName         String
+  contactPhone        String
+  federationId        String?
+  teamId              String?
+  federation          Federation? @relation(fields: [federationId], references: [id])
+  team                Team?       @relation(fields: [teamId], references: [id])
+  updatedAt           DateTime    @default(now()) @updatedAt
+  createdAt           DateTime    @default(now())
+  address             Address?
+
+  @@map("partner_projects")
+}
+
+model UserApproval {
+  id                 String      @id @default(uuid())
+  userId             String      @unique
+  user               User?       @relation(fields: [userId], references: [id])
+  registerDate       String
+  teamId             String?
+  federationId       String?
+  team               Team?       @relation(fields: [teamId], references: [id])
+  federation         Federation? @relation(fields: [federationId], references: [id])
+  status             STATUS      @default(PENDING)
+  teamApproved       Boolean     @default(false)
+  federationApproved Boolean     @default(false)
+  cbhgApproved       Boolean     @default(false)
+  updatedAt          DateTime    @default(now()) @updatedAt
+  createdAt          DateTime    @default(now())
+
+  @@map("user_approvals")
+}
+
+model Transfer {
+  id                          String     @id @default(uuid())
+  userId                      String
+  status                      STATUS     @default(PENDING)
+  observation                 String?
+  cbhgPaymentVoucher          String?
+  federationPaymentVoucher    String?
+  currentTeamId               String
+  currentTeam                 Team       @relation(fields: [currentTeamId], references: [id], name: "current_team")
+  destinationTeamId           String
+  destinationTeam             Team       @relation(fields: [destinationTeamId], references: [id], name: "destination_team")
+  currentFederationId         String
+  currentFederation           Federation @relation(fields: [currentFederationId], references: [id], name: "current_federation")
+  destinationFederationId     String
+  destinationFederation       Federation @relation(fields: [destinationFederationId], references: [id], name: "destination_federation")
+  currentTeamStatus           STATUS     @default(PENDING)
+  destinationTeamStatus       STATUS     @default(PENDING)
+  currentFederationStatus     STATUS     @default(PENDING)
+  destinationFederationStatus STATUS     @default(PENDING)
+  cbhgStatus                  STATUS     @default(PENDING)
+  transferDate                DateTime
+  updatedAt                   DateTime   @default(now()) @updatedAt
+  createdAt                   DateTime   @default(now())
+
+  @@map("transfers")
 }

@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:pg": "docker run --rm -it -p 5432:5432 --name pg-sigh -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=sigh -v sigh_data:/var/lib/postgresql/data -d postgres"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
