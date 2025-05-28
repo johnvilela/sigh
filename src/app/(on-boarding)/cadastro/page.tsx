@@ -1,3 +1,4 @@
+import { RegisterForm } from '@/components/forms/register-form';
 import { Text } from '@/components/ui/text';
 
 export default function RegisterPage() {
@@ -5,6 +6,7 @@ export default function RegisterPage() {
     <div>
       <Text className="text-center">Cadastro de atletas do hóquei brasileiro</Text>
 
+      <RegisterForm />
 
       <Text variant="small" className="text-center text-xs font-normal opacity-60">
         {
