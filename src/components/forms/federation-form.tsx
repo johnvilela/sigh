@@ -1,0 +1,155 @@
+'use client';
+
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreateFederationAction } from "@/lib/modules/federation/federation-actions";
+import { CreateFederationFormSchema } from "@/lib/modules/federation/federation-types";
+import { FileInput } from "../ui/file-input";
+import { AlertCircle, File, Image } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { useRouter } from "next/navigation";
+import { useFileHandler } from "@/hooks/use-file-handler";
+
+const FederationFormSchema = CreateFederationFormSchema.omit({
+  logo: true,
+  presidentDocument: true,
+  federationDocument: true,
+  electionMinutes: true,
+})
+
+export function FederationForm () {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof FederationFormSchema>>({
+    resolver: zodResolver(FederationFormSchema),
+  });
+  const { uploadFiles, registerInput } = useFileHandler({
+    logo: 'newsigh/federation/',
+    presidentDocument: 'newsigh/federation/',
+    federationDocument: 'newsigh/federation/',
+    electionMinutes: 'newsigh/federation/',
+  });
+  const { execute, isExecuting, result } = useAction(CreateFederationAction)
+  const { push } = useRouter()
+
+  if (result.data?.status === 'success') {
+    push('/federacoes')
+    return <></>
+  }
+
+  return (
+    <form
+      className="max-w-3xl mx-auto"
+      onSubmit={handleSubmit(async (data) => {
+        const files = await uploadFiles();
+
+        await execute({
+          ...data,
+          electionMinutes: files.electionMinutes,
+          federationDocument: files.federationDocument,
+          presidentDocument: files.presidentDocument,
+          logo: files.logo,
+        })
+      })}
+    >
+      {result.data?.status === 'error' && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{'Erro ao criar Federação!'}</AlertDescription>
+        </Alert>
+      )}
+      <fieldset className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-8">
+        <div className="md:col-start-2 md:col-span-3">
+          <legend className=" scroll-m-20 text-xl font-semibold">Dados da Federação</legend>
+        </div>
+        <div className="md:col-span-1 h-24 md:h-full">
+          <FileInput
+            hook={registerInput('logo')}
+            label='Logo'
+            divClassName="col-span-1 h-10 h-full"
+            labelClassName="h-full"
+            icon={Image}
+            spanMsg="Clique ou arraste para anexar o LOGO da federação"
+
+          />
+        </div>
+        <div className="col-span-1 md:col-span-3 grid gap-2 grid-cols-1 md:grid-cols-4">
+          <Input
+            label="Nome"
+            divClassName="md:col-span-3 max-w-none"
+            error={errors.name?.message}
+            {...register('name')}
+          />
+          <Input
+            label="Sigla"
+            divClassName="md:col-span-1 max-w-none"
+            error={errors.initials?.message}
+            {...register('initials')}
+          />
+          <Input label="UF" divClassName="md:col-span-1 max-w-none" error={errors.email?.message} {...register('uf')} />
+          <Input
+            type="email"
+            divClassName="md:col-span-3 max-w-none"
+            label="Email"
+            error={errors.email?.message}
+            {...register('email')}
+          />
+        </div>
+      </fieldset>
+      <fieldset className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-8">
+        <legend className="scroll-m-20 text-xl font-semibold">Dados do presidente</legend>
+        <Input
+          divClassName="md:col-span-4 max-w-none"
+          label="Nome do presidente"
+          error={errors.presidentName?.message}
+          {...register('presidentName')}
+        />
+        <Input
+          type="date"
+          divClassName="md:col-span-2 max-w-none"
+          label="Data do início do mandato"
+          error={errors.beginningOfTerm?.message}
+          {...register('beginningOfTerm')}
+        />
+        <Input
+          type="date"
+          divClassName="md:col-span-2 max-w-none"
+          label="Data do fim do mandato"
+          error={errors.endOfTerm?.message}
+          {...register('endOfTerm')}
+        />
+      </fieldset>
+      <fieldset className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <legend className="scroll-m-20 text-xl font-semibold">Documentos</legend>
+        <FileInput
+          hook={registerInput('federationDocument')}
+          divClassName="col-span-1"
+          icon={File}
+          label="Documento da federação"
+          showLabel />
+        <FileInput
+          hook={registerInput('presidentDocument')}
+          divClassName="col-span-1"
+          icon={File}
+          label="Documento do presidente"
+          showLabel />
+        <FileInput
+          hook={registerInput('electionMinutes')}
+          divClassName="col-span-1"
+          icon={File}
+          label="Ata da eleição"
+          showLabel />
+      </fieldset>
+      <div className="flex justify-end mt-4">
+        <Button type="submit" isLoading={isExecuting}>Criar federação</Button>
+      </div>
+    </form>
+  );
+}
