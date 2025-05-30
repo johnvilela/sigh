@@ -16,7 +16,7 @@ import { checkUserRole } from '@/lib/utils/check-user-role';
 import { getValue } from '@/lib/utils/get-value';
 import { formatDictionary } from '@/lib/utils/format-dictionary';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './alert-dialog';
-import { deleteFederationAction } from '@/lib/modules/federation/federation-actions';
+import { ActionResponseType } from '@/lib/utils/action-response-builder';
 
 interface DataListProps {
   user: User;
@@ -62,6 +62,7 @@ interface DataListProps {
     blockRelation?: 'FEDERATION' | 'TEAM';
     blockRelationId?: string;
     roles?: USER_ROLE[];
+    action?: (id: string) => Promise<ActionResponseType>;
   }>;
   customError?: {
     title?: string;
@@ -209,13 +210,22 @@ export function DataList ({
     router.push(filterUrl);
   }
 
-  let deleteId = ''
-
   useEffect(() => {
     const filterObj = Object.fromEntries(searchParams.entries());
 
     setFilter(filterObj);
   }, [searchParams]);
+
+  let itemId = '';
+  let itemAction: ((id: string) => Promise<ActionResponseType>) | undefined;
+
+  async function deleteItem () {
+    if (!itemId || !itemAction) return;
+
+    const res = await itemAction(itemId)
+
+    if (res.status === 'success' && itemId) setOptimisticDelete((old) => [...old, itemId]);
+  }
 
   function paginationComponent () {
     if (paginationSettings) {
@@ -396,7 +406,10 @@ export function DataList ({
                           size="icon"
                           variant="ghost"
                           className="text-destructive hover:text-red-800"
-                          onClick={() => deleteId = obj[lineKey] as string}
+                          onClick={() => {
+                            itemId = obj[lineKey] as string;
+                            itemAction = action.action;
+                          }}
                         >
                           <Trash />
                         </Button>
@@ -441,11 +454,7 @@ export function DataList ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             variant='destructive'
-            onClick={async () => {
-              const res = await deleteFederationAction(deleteId)
-
-              if (res.status === 'success') setOptimisticDelete((old) => [...old, deleteId]);
-            }}
+            onClick={deleteItem}
           >
             Apagar
           </AlertDialogAction>

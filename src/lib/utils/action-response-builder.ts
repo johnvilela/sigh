@@ -10,3 +10,5 @@ export function actionResponseBuilder<T> () {
     }),
   };
 }
+
+export type ActionResponseType = ReturnType<ReturnType<typeof actionResponseBuilder>['success']> | ReturnType<ReturnType<typeof actionResponseBuilder>['error']>;

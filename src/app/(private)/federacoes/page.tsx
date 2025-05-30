@@ -1,6 +1,7 @@
 import { DataList } from "@/components/ui/data-list";
 import { ModuleLayout } from "@/components/ui/module-layout";
 import { USER_ROLE } from "@/generated/prisma";
+import { deleteFederationAction } from "@/lib/modules/federation/federation-actions";
 import { federationService } from "@/lib/modules/federation/federation-service";
 import { getLoggedUserAction } from "@/lib/modules/user/user-actions";
 
@@ -56,6 +57,7 @@ export default async function FederationsPage ({ searchParams }: { searchParams:
             roles: [USER_ROLE.ADMIN],
             blockBy: 'ROLE',
             blockRelation: 'FEDERATION',
+            action: deleteFederationAction,
           },
           {
             type: 'VIEW',
