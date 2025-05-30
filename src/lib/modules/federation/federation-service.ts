@@ -1,5 +1,5 @@
 import db from "@/lib/services/db";
-import { CreateFederationFormDTO, GetAllFederationParameter, GetFederationByIdParams } from "./federation-types";
+import { MutateFederationFormDTO, GetAllFederationParameter, GetFederationByIdParams } from "./federation-types";
 import dayjs from "dayjs";
 
 export function FederationService () {
@@ -33,7 +33,7 @@ export function FederationService () {
         },
       });
     },
-    async create (data: CreateFederationFormDTO) {
+    async create (data: MutateFederationFormDTO) {
       return db.federation.create({
         data: {
           ...data,
@@ -41,6 +41,20 @@ export function FederationService () {
           endOfTerm: dayjs(data.endOfTerm).toDate(),
         },
       });
-    }
+    },
+    async update (data: MutateFederationFormDTO) {
+      if (!data.id) {
+        throw new Error("ID is required for updating a federation");
+      }
+
+      return db.federation.update({
+        where: { id: data.id },
+        data: {
+          ...data,
+          beginningOfTerm: dayjs(data.beginningOfTerm).toDate(),
+          endOfTerm: dayjs(data.endOfTerm).toDate(),
+        },
+      });
+    },
   }
 }

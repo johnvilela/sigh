@@ -10,6 +10,7 @@ export interface IRegisterMethodReturn {
 }
 
 export const useFileHandler = <T extends string> (config: Record<T, string>) => {
+  const [generalStatus, setGeneralStatus] = useState<GenericStatus>(GenericStatus.IDLE);
   const [files, setFiles] = useState<Record<T, File>>(() => {
     return {} as Record<T, File>;
   });
@@ -32,11 +33,13 @@ export const useFileHandler = <T extends string> (config: Record<T, string>) => 
   }, []);
 
   const uploadFiles = useCallback(async (): Promise<Record<string, string>> => {
+    setGeneralStatus(GenericStatus.EXECUTING);
     const result: Record<string, string> = {};
 
     for (const key in config) {
       if (!files[key]) {
-        throw new Error(`File for "${key}" is not selected.`);
+        console.warn(`File for "${key}" is not selected.`);
+        continue
       }
     }
 
@@ -65,10 +68,12 @@ export const useFileHandler = <T extends string> (config: Record<T, string>) => 
         setStatus(prev => ({ ...prev, [key]: GenericStatus.SUCCESS }));
       } catch (error) {
         console.error(`Error uploading ${key}:`, error);
+        setGeneralStatus(GenericStatus.ERROR);
         setStatus(prev => ({ ...prev, [key]: GenericStatus.ERROR }));
       }
     }
 
+    setGeneralStatus(GenericStatus.SUCCESS);
     return result;
   }, [files, config]);
 
@@ -79,5 +84,5 @@ export const useFileHandler = <T extends string> (config: Record<T, string>) => 
     clearAction: () => clearFile(key),
   }), [files, onChangeFile, status, clearFile]);
 
-  return { onChangeFile, uploadFiles, clearFile, files, status, registerInput };
+  return { onChangeFile, uploadFiles, clearFile, files, status, registerInput, generalStatus };
 };

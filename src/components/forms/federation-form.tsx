@@ -5,43 +5,65 @@ import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateFederationAction } from "@/lib/modules/federation/federation-actions";
-import { CreateFederationFormSchema } from "@/lib/modules/federation/federation-types";
+import { MutateFederationAction } from "@/lib/modules/federation/federation-actions";
+import { MutateFederationFormSchema } from "@/lib/modules/federation/federation-types";
 import { FileInput } from "../ui/file-input";
 import { AlertCircle, File, Image } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { useRouter } from "next/navigation";
 import { useFileHandler } from "@/hooks/use-file-handler";
+import { useEffect } from "react";
+import { GenericStatus } from "@/lib/shared/enums/generic-status";
+import { Federation } from "@/generated/prisma";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
-const FederationFormSchema = CreateFederationFormSchema.omit({
+dayjs.extend(utc)
+
+const FederationFormSchema = MutateFederationFormSchema.omit({
   logo: true,
   presidentDocument: true,
   federationDocument: true,
   electionMinutes: true,
 })
 
-export function FederationForm () {
+interface FederationFormProps {
+  federation?: Federation;
+  isEditing?: boolean;
+}
+
+export function FederationForm ({ federation, isEditing }: FederationFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<z.infer<typeof FederationFormSchema>>({
     resolver: zodResolver(FederationFormSchema),
+    defaultValues: {
+      name: federation?.name || '',
+      initials: federation?.initials || '',
+      uf: federation?.uf || '',
+      email: federation?.email || '',
+      presidentName: federation?.presidentName || '',
+      beginningOfTerm: dayjs.utc(federation?.beginningOfTerm).format('YYYY-MM-DD') || undefined,
+      endOfTerm: dayjs.utc(federation?.endOfTerm).format('YYYY-MM-DD') || undefined,
+    },
   });
-  const { uploadFiles, registerInput } = useFileHandler({
+  const { uploadFiles, registerInput, generalStatus } = useFileHandler({
     logo: 'newsigh/federation/',
     presidentDocument: 'newsigh/federation/',
     federationDocument: 'newsigh/federation/',
     electionMinutes: 'newsigh/federation/',
   });
-  const { execute, isExecuting, result } = useAction(CreateFederationAction)
+  const { execute, isExecuting, result } = useAction(MutateFederationAction)
   const { push } = useRouter()
 
-  if (result.data?.status === 'success') {
-    push('/federacoes')
-    return <></>
-  }
+  useEffect(() => {
+    if (result.data?.status === 'success') push('/federacoes')
+  }, [push, result.data?.status])
+
+  const isSubmitting = isExecuting || generalStatus === GenericStatus.EXECUTING;
 
   return (
     <form
@@ -51,10 +73,11 @@ export function FederationForm () {
 
         await execute({
           ...data,
-          electionMinutes: files.electionMinutes,
-          federationDocument: files.federationDocument,
-          presidentDocument: files.presidentDocument,
-          logo: files.logo,
+          id: federation?.id || undefined,
+          electionMinutes: files.electionMinutes || undefined,
+          federationDocument: files.federationDocument || undefined,
+          presidentDocument: files.presidentDocument || undefined,
+          logo: files.logo || undefined,
         })
       })}
     >
@@ -77,7 +100,7 @@ export function FederationForm () {
             labelClassName="h-full"
             icon={Image}
             spanMsg="Clique ou arraste para anexar o LOGO da federação"
-
+            fileUrl={federation?.logo || ''}
           />
         </div>
         <div className="col-span-1 md:col-span-3 grid gap-2 grid-cols-1 md:grid-cols-4">
@@ -133,22 +156,25 @@ export function FederationForm () {
           divClassName="col-span-1"
           icon={File}
           label="Documento da federação"
+          fileUrl={federation?.federationDocument || ''}
           showLabel />
         <FileInput
           hook={registerInput('presidentDocument')}
           divClassName="col-span-1"
           icon={File}
           label="Documento do presidente"
+          fileUrl={federation?.presidentDocument || ''}
           showLabel />
         <FileInput
           hook={registerInput('electionMinutes')}
           divClassName="col-span-1"
           icon={File}
           label="Ata da eleição"
+          fileUrl={federation?.electionMinutes || ''}
           showLabel />
       </fieldset>
       <div className="flex justify-end mt-4">
-        <Button type="submit" isLoading={isExecuting}>Criar federação</Button>
+        <Button type="submit" isLoading={isSubmitting}>{isEditing ? 'Editar' : 'Criar'} federação</Button>
       </div>
     </form>
   );

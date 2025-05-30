@@ -362,13 +362,14 @@ export function DataList ({
                   if (action.type === 'EDIT') {
                     return (
                       <Button size="icon" variant="ghost" key={action.type}>
-                        <Link href={action.editUrl!}>
+                        <Link href={`${action.editUrl!}/${obj.id}/editar`}>
                           <Pencil />
                         </Link>
                       </Button>
                     );
                   }
 
+                  // TODO: adicionar lógica de confirmação de exclusão
                   if (action.type === 'DELETE') {
                     return (
                       <Button

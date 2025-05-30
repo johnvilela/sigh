@@ -45,7 +45,7 @@ function Button ({ className, variant, size, isLoading = false, asChild = false,
 
   if (isLoading)
     return (
-      <div className={classHelper(buttonVariants({ variant, size, className }))}>
+      <div className={classHelper(buttonVariants({ variant, size, className }), 'opacity-80 bg-neutral-400 min-w-32')}>
         <LoaderCircle className="animate-spin" />
       </div>
     );

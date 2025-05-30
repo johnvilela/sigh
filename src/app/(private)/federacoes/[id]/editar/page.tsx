@@ -1,0 +1,20 @@
+import { FederationForm } from '@/components/forms/federation-form';
+import { ModuleLayout } from '@/components/ui/module-layout';
+import { FederationService } from '@/lib/modules/federation/federation-service';
+
+export default async function EditFederationPage ({ params }: { params: { id: string } }) {
+  const { id } = await params;
+  const federation = await FederationService().getById({ id, includeTeams: true, includeAthletes: true });
+
+  return (
+    <ModuleLayout
+      breadcrumbItems={[
+        { label: 'Federações', href: '/federacoes' },
+        { label: federation!.initials!, href: `/federacoes/${federation!.id}` },
+        { label: 'Editar', href: `/federacoes/${federation!.id}/editar` },
+      ]}
+    >
+      <FederationForm federation={federation || undefined} isEditing />
+    </ModuleLayout>
+  );
+}
