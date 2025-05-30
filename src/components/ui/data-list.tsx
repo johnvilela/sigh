@@ -16,7 +16,7 @@ import { checkUserRole } from '@/lib/utils/check-user-role';
 import { getValue } from '@/lib/utils/get-value';
 import { formatDictionary } from '@/lib/utils/format-dictionary';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './alert-dialog';
-import { DeleteFederationAction } from '@/lib/modules/federation/federation-actions';
+import { deleteFederationAction } from '@/lib/modules/federation/federation-actions';
 
 interface DataListProps {
   user: User;
@@ -442,7 +442,7 @@ export function DataList ({
           <AlertDialogAction
             variant='destructive'
             onClick={async () => {
-              const res = await DeleteFederationAction(deleteId)
+              const res = await deleteFederationAction(deleteId)
 
               if (res.status === 'success') setOptimisticDelete((old) => [...old, deleteId]);
             }}

@@ -2,39 +2,39 @@
 
 import { actionClient } from "@/lib/services/safe-action";
 import { MutateFederationFormSchema } from "./federation-types";
-import { FederationService } from "./federation-service";
-import { ActionResponseBuilder } from "@/lib/utils/action-response-builder";
+import { federationService } from "./federation-service";
+import { actionResponseBuilder } from "@/lib/utils/action-response-builder";
 
-export const MutateFederationAction = actionClient.schema(MutateFederationFormSchema).action(async ({ parsedInput }) => {
+export const mutateFederationAction = actionClient.schema(MutateFederationFormSchema).action(async ({ parsedInput }) => {
   try {
     const { id } = parsedInput;
   
-    const federation = !id ? await FederationService().create(parsedInput) : await FederationService().update(parsedInput);
+    const federation = !id ? await federationService().create(parsedInput) : await federationService().update(parsedInput);
 
-    return ActionResponseBuilder().success(federation);
+    return actionResponseBuilder().success(federation);
   } catch (error) {
     if (error instanceof Error) {
-      return ActionResponseBuilder().error(error.message);
+      return actionResponseBuilder().error(error.message);
     }
 
-    return ActionResponseBuilder().error("Error ao criar federação");
+    return actionResponseBuilder().error("Error ao criar federação");
   }
 });
 
-export async function DeleteFederationAction (id: string) {
+export async function deleteFederationAction (id: string) {
   if (!id) {
-    return ActionResponseBuilder().error("ID da federação não fornecido");
+    return actionResponseBuilder().error("ID da federação não fornecido");
   }
 
   try {
-    await FederationService().delete(id);
+    await federationService().delete(id);
 
-    return ActionResponseBuilder().success("Federação excluída com sucesso");
+    return actionResponseBuilder().success("Federação excluída com sucesso");
   } catch (error) {
     if (error instanceof Error) {
-      return ActionResponseBuilder().error(error.message);
+      return actionResponseBuilder().error(error.message);
     }
 
-    return ActionResponseBuilder().error("Erro ao excluir federação");
+    return actionResponseBuilder().error("Erro ao excluir federação");
   }
 }

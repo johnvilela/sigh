@@ -3,7 +3,7 @@ import { CreateUserDTO } from './user-types';
 import { USER_ROLE } from '@/generated/prisma';
 import dayjs from 'dayjs';
 
-export function UserService () {
+export function userService () {
   return {
     async create ({ birthDate, document, email, name, id }: CreateUserDTO) {
       if (!birthDate || !document || !email || !name || !id) {

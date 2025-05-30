@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useAction } from 'next-safe-action/hooks';
-import { CreateUserAction } from '@/lib/modules/user/user-actions';
+import { createUserAction } from '@/lib/modules/user/user-actions';
 import { CreateUserSchema } from '@/lib/modules/user/user-types';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -19,7 +19,7 @@ export function RegisterForm() {
   } = useForm<z.infer<typeof CreateUserSchema>>({
     resolver: zodResolver(CreateUserSchema),
   });
-  const { execute, isExecuting, result } = useAction(CreateUserAction);
+  const { execute, isExecuting, result } = useAction(createUserAction);
 
   return (
     <form className="flex flex-col gap-2 my-2" onSubmit={handleSubmit(execute)}>

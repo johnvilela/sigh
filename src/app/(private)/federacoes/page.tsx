@@ -1,14 +1,14 @@
 import { DataList } from "@/components/ui/data-list";
 import { ModuleLayout } from "@/components/ui/module-layout";
 import { USER_ROLE } from "@/generated/prisma";
-import { FederationService } from "@/lib/modules/federation/federation-service";
-import { GetLoggedUserAction } from "@/lib/modules/user/user-actions";
+import { federationService } from "@/lib/modules/federation/federation-service";
+import { getLoggedUserAction } from "@/lib/modules/user/user-actions";
 
 export default async function FederationsPage ({ searchParams }: { searchParams: Promise<{ name?: string }> }) {
   const { name } = await searchParams;
-  const user = await GetLoggedUserAction();
+  const user = await getLoggedUserAction();
 
-  const federations = await FederationService().getAll({ name });
+  const federations = await federationService().getAll({ name });
 
   return (
     <ModuleLayout breadcrumbItems={[{ label: 'Federações', href: '/app/federacoes' }]}>

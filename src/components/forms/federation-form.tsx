@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MutateFederationAction } from "@/lib/modules/federation/federation-actions";
+import { mutateFederationAction } from "@/lib/modules/federation/federation-actions";
 import { MutateFederationFormSchema } from "@/lib/modules/federation/federation-types";
 import { FileInput } from "../ui/file-input";
 import { AlertCircle, File, Image } from "lucide-react";
@@ -56,7 +56,7 @@ export function FederationForm ({ federation, isEditing }: FederationFormProps) 
     federationDocument: 'newsigh/federation/',
     electionMinutes: 'newsigh/federation/',
   });
-  const { execute, isExecuting, result } = useAction(MutateFederationAction)
+  const { execute, isExecuting, result } = useAction(mutateFederationAction)
   const { push } = useRouter()
 
   useEffect(() => {

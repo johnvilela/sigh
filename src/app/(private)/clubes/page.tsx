@@ -1,19 +1,19 @@
 import { ModuleLayout } from '@/components/ui/module-layout';
 import { DataList } from '@/components/ui/data-list';
-import { FederationService } from '@/lib/modules/federation/federation-service';
+import { federationService } from '@/lib/modules/federation/federation-service';
 import { teamService } from '@/lib/modules/team/team-service';
 import { USER_ROLE } from '@/generated/prisma';
-import { GetLoggedUserAction } from '@/lib/modules/user/user-actions';
+import { getLoggedUserAction } from '@/lib/modules/user/user-actions';
 
 export default async function TeamsPage ({ searchParams }: { searchParams: { name?: string } }) {
-  const federations = (await FederationService().getAllSmall())
+  const federations = (await federationService().getAllSmall())
     .map((fed) => ({ value: fed.id!, label: fed.name! }))
     .filter((fed) => fed.label != 'CBHG');
   const teams = await teamService().getAll({
     includeFederation: true,
     filter: searchParams,
   });
-  const user = await GetLoggedUserAction();
+  const user = await getLoggedUserAction();
 
   return (
     <ModuleLayout breadcrumbItems={[{ label: 'Clubes', href: '/app/clubes' }]}>

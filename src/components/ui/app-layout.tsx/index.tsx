@@ -19,7 +19,7 @@ import { MenuList } from './menu-list';
 import { User, USER_ROLE } from '@/generated/prisma';
 import { checkUserRole } from '@/lib/utils/check-user-role';
 import { MenuFooter } from './menu-footer';
-import { GetLoggedUserAction } from '@/lib/modules/user/user-actions';
+import { getLoggedUserAction } from '@/lib/modules/user/user-actions';
 
 export type MenuListDataType = {
   [key: string | 'App' | 'Listagens' | 'Interno']: { label: string; href: string; icon: ReactElement }[];
@@ -73,7 +73,7 @@ function MenuListData (user: User): MenuListDataType {
 }
 
 export async function AppLayout () {
-  const user = await GetLoggedUserAction();
+  const user = await getLoggedUserAction();
 
   return (
     <Sidebar>

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useAction } from 'next-safe-action/hooks';
-import { CreateSessionAction } from '@/lib/modules/session/session-actions';
+import { createSessionAction } from '@/lib/modules/session/session-actions';
 import { CreateSessionSchema } from '@/lib/modules/session/session-types';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -19,7 +19,7 @@ export function LoginForm() {
   } = useForm<z.infer<typeof CreateSessionSchema>>({
     resolver: zodResolver(CreateSessionSchema),
   });
-  const { execute, isExecuting, result } = useAction(CreateSessionAction);
+  const { execute, isExecuting, result } = useAction(createSessionAction);
 
   return (
     <form className="flex flex-col gap-2 my-2" onSubmit={handleSubmit(execute)}>

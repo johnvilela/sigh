@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../avatar';
 import { ChevronUp, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { User } from '@/generated/prisma';
-import { DeleteSessionAction } from '@/lib/modules/session/session-actions';
+import { deleteSessionAction } from '@/lib/modules/session/session-actions';
 
 export function MenuFooter ({ user }: { user: User }) {
   return (
@@ -33,7 +33,7 @@ export function MenuFooter ({ user }: { user: User }) {
             <DropdownMenuItem asChild>
               <Link href="/perfil">Meu Perfil</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => DeleteSessionAction()}>
+            <DropdownMenuItem onClick={() => deleteSessionAction()}>
               <span className="text-destructive">Sair da conta</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

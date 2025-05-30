@@ -2,7 +2,7 @@ import { hashService } from '@/lib/services/hash-service';
 import { CreateCredentialDTO, ValidateCredentialDTO } from './credential-types';
 import db from '@/lib/services/db';
 
-export function CredentialService() {
+export function credentialService () {
   return {
     async create({ email, password }: CreateCredentialDTO) {
       const hashedPassword = await hashService().hash(password);

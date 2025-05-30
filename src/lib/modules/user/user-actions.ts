@@ -1,15 +1,15 @@
 'use server';
 
 import { actionClient } from '@/lib/services/safe-action';
-import { SessionService } from '../session/session-service';
+import { sessionService } from '../session/session-service';
 import { cookies } from 'next/headers';
-import { ActionResponseBuilder } from '@/lib/utils/action-response-builder';
+import { actionResponseBuilder } from '@/lib/utils/action-response-builder';
 import { redirect } from 'next/navigation';
-import { CredentialService } from '../credential/credential-service';
-import { UserService } from './user-service';
+import { credentialService } from '../credential/credential-service';
+import { userService } from './user-service';
 import { CreateUserSchema } from './user-types';
 
-export const CreateUserAction = actionClient
+export const createUserAction = actionClient
   .schema(CreateUserSchema)
   .action(async ({ clientInput: { email, birthDate, document, name, teamId, password } }) => {
     let canRedirect = false;
@@ -17,9 +17,9 @@ export const CreateUserAction = actionClient
     try {
       const cookiesStore = await cookies();
 
-      const credential = await CredentialService().create({ email, password });
+      const credential = await credentialService().create({ email, password });
 
-      const user = await UserService().create({
+      const user = await userService().create({
         id: credential.id,
         name: name,
         email: email,
@@ -28,7 +28,7 @@ export const CreateUserAction = actionClient
         teamId: teamId,
       });
 
-      const session = await SessionService().create({ email, password });
+      const session = await sessionService().create({ email, password });
 
       cookiesStore.set({
         name: 'sessionId',
@@ -50,18 +50,18 @@ export const CreateUserAction = actionClient
       canRedirect = true;
     } catch (error) {
       if (error instanceof Error) {
-        return ActionResponseBuilder().error(error.message);
+        return actionResponseBuilder().error(error.message);
       }
     }
 
     if (canRedirect) {
       redirect('/dashboard');
     } else {
-      return ActionResponseBuilder().error('Error ao criar usuário');
+      return actionResponseBuilder().error('Error ao criar usuário');
     }
   });
 
-export const GetLoggedUserAction = async () => {
+export const getLoggedUserAction = async () => {
   const cookiesStore = await cookies();
 
   // TODO: adicionar validação de sessão
@@ -72,7 +72,7 @@ export const GetLoggedUserAction = async () => {
     return null;
   }
 
-  const user = await UserService().findOne(userId);
+  const user = await userService().findOne(userId);
 
   if (!user) {
     return null;

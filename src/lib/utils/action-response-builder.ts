@@ -1,4 +1,4 @@
-export function ActionResponseBuilder<T>() {
+export function actionResponseBuilder<T> () {
   return {
     success: (data: T) => ({
       status: 'success',

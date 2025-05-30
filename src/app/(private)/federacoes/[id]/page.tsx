@@ -4,14 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
 import Link from 'next/link';
 import dayjs from 'dayjs';
-import { FederationService } from '@/lib/modules/federation/federation-service';
+import { federationService } from '@/lib/modules/federation/federation-service';
 import { ModuleLayout } from '@/components/ui/module-layout';
 import { USER_ROLE } from '@/generated/prisma';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default async function FederationDetailsPage ({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const federation = await FederationService().getById({ id, includeTeams: true, includeAthletes: true });
+  const federation = await federationService().getById({ id, includeTeams: true, includeAthletes: true });
 
   function renderTermDate () {
     if (!federation?.beginningOfTerm || !federation?.endOfTerm) return 'Sem dados do mandato';
@@ -28,7 +28,7 @@ export default async function FederationDetailsPage ({ params }: { params: Promi
       <ModuleLayout
         breadcrumbItems={[
           { label: 'Federações', href: '/federacoes' },
-          { label: 'Não encontrado', href: `/federacoes/${id}` },
+          { label: 'Não encontrado', href: `/federacoes` },
         ]}
       >
         <Alert>

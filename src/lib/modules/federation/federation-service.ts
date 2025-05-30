@@ -2,7 +2,7 @@ import db from "@/lib/services/db";
 import { MutateFederationFormDTO, GetAllFederationParameter, GetFederationByIdParams } from "./federation-types";
 import dayjs from "dayjs";
 
-export function FederationService () {
+export function federationService () {
   return {
     async getById ({ id, includeAthletes = false, includeTeams = false, includeUsers = false }: GetFederationByIdParams) {
       return db.federation.findUnique({

@@ -2,18 +2,18 @@
 
 import { actionClient } from '@/lib/services/safe-action';
 import { CreateSessionSchema } from './session-types';
-import { SessionService } from './session-service';
+import { sessionService } from './session-service';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { ActionResponseBuilder } from '@/lib/utils/action-response-builder';
+import { actionResponseBuilder } from '@/lib/utils/action-response-builder';
 
-export const CreateSessionAction = actionClient
+export const createSessionAction = actionClient
   .schema(CreateSessionSchema)
   .action(async ({ clientInput: { email, password } }) => {
     let canRedirect = false;
 
     try {
-      const session = await SessionService().create({ email, password });
+      const session = await sessionService().create({ email, password });
 
       const cookiesStore = await cookies();
 
@@ -37,25 +37,25 @@ export const CreateSessionAction = actionClient
       canRedirect = true;
     } catch (error) {
       if (error instanceof Error) {
-        return ActionResponseBuilder().error(error.message);
+        return actionResponseBuilder().error(error.message);
       }
 
-      return ActionResponseBuilder().error('Erro ao criar sessão');
+      return actionResponseBuilder().error('Erro ao criar sessão');
     }
 
     if (canRedirect) {
       redirect('/dashboard');
     } else {
-      return ActionResponseBuilder().error('Erro ao criar sessão');
+      return actionResponseBuilder().error('Erro ao criar sessão');
     }
   });
 
-export const DeleteSessionAction = async () => {
+export const deleteSessionAction = async () => {
   const cookiesStore = await cookies();
   const sessionId = cookiesStore.get('sessionId')?.value;
 
   if (sessionId) {
-    await SessionService().delete(sessionId);
+    await sessionService().delete(sessionId);
   }
 
   cookiesStore.delete('userId');
@@ -64,7 +64,7 @@ export const DeleteSessionAction = async () => {
   redirect('/login');
 };
 
-export const ValidateSessionAction = async () => {
+export const validateSessionAction = async () => {
   const cookiesStore = await cookies();
   const sessionId = cookiesStore.get('sessionId')?.value;
 
@@ -75,7 +75,7 @@ export const ValidateSessionAction = async () => {
   let canRedirect = false;
 
   try {
-    const session = await SessionService().checkIfValid(sessionId);
+    const session = await sessionService().checkIfValid(sessionId);
 
     canRedirect = !session;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

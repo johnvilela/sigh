@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
 import { CreateSessionDTO } from './session-types';
-import { CredentialService } from '../credential/credential-service';
+import { credentialService } from '../credential/credential-service';
 import db from '@/lib/services/db';
 
-export function SessionService () {
+export function sessionService () {
   const EXPIRES_AT = Number(process.env.SESSION_EXPIRES_AT_DAYS!) || 1;
 
   return {
     async create ({ email, password }: CreateSessionDTO) {
-      const credential = await CredentialService().validate({ email, password });
+      const credential = await credentialService().validate({ email, password });
 
       if (!credential) {
         throw new Error('Credenciais inválidas');
