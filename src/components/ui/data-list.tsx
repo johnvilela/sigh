@@ -15,6 +15,8 @@ import { User, USER_ROLE } from '@/generated/prisma';
 import { checkUserRole } from '@/lib/utils/check-user-role';
 import { getValue } from '@/lib/utils/get-value';
 import { formatDictionary } from '@/lib/utils/format-dictionary';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './alert-dialog';
+import { DeleteFederationAction } from '@/lib/modules/federation/federation-actions';
 
 interface DataListProps {
   user: User;
@@ -22,6 +24,10 @@ interface DataListProps {
   lineKey: string;
   caption: string;
   filterUrl: string;
+  alert?: {
+    title: string;
+    description: string;
+  }
   filters?: Array<{
     label: string;
     key: string;
@@ -74,9 +80,11 @@ export function DataList ({
   paginationSettings,
   actions = [],
   headerBtn,
+  alert,
   customError,
 }: DataListProps) {
   const [filter, setFilter] = useState<Record<string, string>>({});
+  const [optimisticDelete, setOptimisticDelete] = useState<Array<string>>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -201,6 +209,8 @@ export function DataList ({
     router.push(filterUrl);
   }
 
+  let deleteId = ''
+
   useEffect(() => {
     const filterObj = Object.fromEntries(searchParams.entries());
 
@@ -253,7 +263,7 @@ export function DataList ({
   }
 
   return (
-    <>
+    <AlertDialog>
       <div className="flex flex-col md:flex-row md:justify-between gap-2 mb-8">
         <div className="flex flex-1 gap-2">
           {filters &&
@@ -333,7 +343,13 @@ export function DataList ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((obj) => (
+          {data.filter((obj) => {
+            const objId = obj['id'] as string;
+
+            if (optimisticDelete.includes(objId)) return false;
+
+            return obj
+          }).map((obj) => (
             <TableRow key={obj[lineKey] as string}>
               {tableSettings.map((line) => (
                 <TableCell className={line.lineClassname} key={`${obj[lineKey]}-${line.name}`}>
@@ -372,14 +388,19 @@ export function DataList ({
                   // TODO: adicionar lógica de confirmação de exclusão
                   if (action.type === 'DELETE') {
                     return (
-                      <Button
+                      <AlertDialogTrigger
                         key={action.type}
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:text-red-800"
+                        asChild
                       >
-                        <Trash />
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:text-red-800"
+                          onClick={() => deleteId = obj[lineKey] as string}
+                        >
+                          <Trash />
+                        </Button>
+                      </AlertDialogTrigger>
                     );
                   }
 
@@ -409,6 +430,27 @@ export function DataList ({
       <div className='mt-4'>
         {paginationComponent()}
       </div >
-    </>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{alert?.title || 'Desejar apagar?'}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {alert?.description || 'Essa ação não poderá ser desfeita.'}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            variant='destructive'
+            onClick={async () => {
+              const res = await DeleteFederationAction(deleteId)
+
+              if (res.status === 'success') setOptimisticDelete((old) => [...old, deleteId]);
+            }}
+          >
+            Apagar
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </ AlertDialog>
   );
 }

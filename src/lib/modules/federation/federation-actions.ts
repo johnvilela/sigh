@@ -20,3 +20,21 @@ export const MutateFederationAction = actionClient.schema(MutateFederationFormSc
     return ActionResponseBuilder().error("Error ao criar federação");
   }
 });
+
+export async function DeleteFederationAction (id: string) {
+  if (!id) {
+    return ActionResponseBuilder().error("ID da federação não fornecido");
+  }
+
+  try {
+    await FederationService().delete(id);
+
+    return ActionResponseBuilder().success("Federação excluída com sucesso");
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponseBuilder().error(error.message);
+    }
+
+    return ActionResponseBuilder().error("Erro ao excluir federação");
+  }
+}

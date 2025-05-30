@@ -56,5 +56,14 @@ export function FederationService () {
         },
       });
     },
+    async delete (id: string) {
+      if (!id) {
+        throw new Error("ID is required for deleting a federation");
+      }
+
+      return db.federation.delete({
+        where: { id },
+      });
+    },
   }
 }
