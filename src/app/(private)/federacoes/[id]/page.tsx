@@ -9,7 +9,7 @@ import { ModuleLayout } from '@/components/ui/module-layout';
 import { USER_ROLE } from '@/generated/prisma';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-export default async function FederationDetailsPage ({ params }: { params: { id: string } }) {
+export default async function FederationDetailsPage ({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const federation = await FederationService().getById({ id, includeTeams: true, includeAthletes: true });
 

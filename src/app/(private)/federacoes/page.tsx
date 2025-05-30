@@ -4,7 +4,7 @@ import { USER_ROLE } from "@/generated/prisma";
 import { FederationService } from "@/lib/modules/federation/federation-service";
 import { GetLoggedUserAction } from "@/lib/modules/user/user-actions";
 
-export default async function FederationsPage ({ searchParams }: { searchParams: { name?: string } }) {
+export default async function FederationsPage ({ searchParams }: { searchParams: Promise<{ name?: string }> }) {
   const { name } = await searchParams;
   const user = await GetLoggedUserAction();
 
