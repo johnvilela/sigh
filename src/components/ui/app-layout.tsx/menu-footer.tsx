@@ -31,7 +31,7 @@ export function MenuFooter ({ user }: { user: User }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
             <DropdownMenuItem asChild>
-              <Link href="/app/perfil">Meu Perfil</Link>
+              <Link href="/perfil">Meu Perfil</Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => DeleteSessionAction()}>
               <span className="text-destructive">Sair da conta</span>
