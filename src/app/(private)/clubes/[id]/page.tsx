@@ -8,7 +8,7 @@ import Link from 'next/link';
 import dayjs from 'dayjs';
 import { USER_ROLE } from '@/generated/prisma';
 
-export default async function TeamDetailsPage ({ params }: { params: { id: string } }) {
+export default async function TeamDetailsPage ({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const team = await teamService().getById({ id, includeAthletes: true });
 
