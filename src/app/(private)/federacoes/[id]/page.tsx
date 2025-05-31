@@ -48,7 +48,7 @@ export default async function FederationDetailsPage ({ params }: { params: Promi
         { label: federation!.initials!, href: `/federacoes/${federation!.id}` },
       ]}
     >
-      <Card>
+      <Card className='max-w-4xl mx-auto'>
         <CardHeader>
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <Image

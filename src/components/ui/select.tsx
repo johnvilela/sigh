@@ -5,6 +5,33 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 import { classHelper } from "@/lib/utils/class-helper"
+import { Label } from "./label"
+
+function SelectWrapper ({
+  className,
+  children,
+  label,
+  name,
+  error,
+  ...props
+}: React.ComponentProps<'div'> & {
+  className?: string
+  label?: string
+  name?: string
+  error?: string
+}) {
+  return (
+    <div
+      className={classHelper("w-full", className)}
+      {...props}
+    >
+
+      {label && <Label htmlFor={name}>{label}</Label>}
+      {children}
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+    </div>
+  )
+}
 
 function Select ({
   ...props
@@ -172,6 +199,7 @@ function SelectScrollDownButton ({
 }
 
 export {
+  SelectWrapper,
   Select,
   SelectContent,
   SelectGroup,

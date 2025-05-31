@@ -6,7 +6,7 @@ export default function NewFederationPage () {
     <ModuleLayout
       breadcrumbItems={[
         { label: 'Federações', href: '/federacoes' },
-        { label: 'Nova federação', href: '/federacoes/nova' },
+        { label: 'Nova federação', href: '/federacoes/novo' },
       ]}
     >
       <FederationForm />

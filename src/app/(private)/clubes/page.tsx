@@ -4,24 +4,30 @@ import { federationService } from '@/lib/modules/federation/federation-service';
 import { teamService } from '@/lib/modules/team/team-service';
 import { USER_ROLE } from '@/generated/prisma';
 import { getLoggedUserAction } from '@/lib/modules/user/user-actions';
+import { deleteTeamAction } from '@/lib/modules/team/team-actions';
 
-export default async function TeamsPage ({ searchParams }: { searchParams: { name?: string } }) {
+export default async function TeamsPage ({ searchParams }: { searchParams: Promise<{ name?: string, federationId?: string }> }) {
+  const { name, federationId } = await searchParams;
+
   const federations = (await federationService().getAllSmall())
     .map((fed) => ({ value: fed.id!, label: fed.name! }))
     .filter((fed) => fed.label != 'CBHG');
   const teams = await teamService().getAll({
     includeFederation: true,
-    filter: searchParams,
+    filter: {
+      name,
+      federationId
+    },
   });
   const user = await getLoggedUserAction();
 
   return (
-    <ModuleLayout breadcrumbItems={[{ label: 'Clubes', href: '/app/clubes' }]}>
+    <ModuleLayout breadcrumbItems={[{ label: 'Clubes', href: '/clubes' }]}>
       <DataList
         data={teams}
         caption="Listagem de clubes"
         lineKey="id"
-        filterUrl="/app/clubes"
+        filterUrl="/clubes"
         user={user!}
         filters={[
           {
@@ -38,7 +44,7 @@ export default async function TeamsPage ({ searchParams }: { searchParams: { nam
         ]}
         headerBtn={{
           label: 'Novo clube',
-          href: '/app/clube/novo',
+          href: '/clubes/novo',
         }}
         tableSettings={[
           {
@@ -53,20 +59,21 @@ export default async function TeamsPage ({ searchParams }: { searchParams: { nam
           {
             type: 'EDIT',
             roles: [USER_ROLE.ADMIN, USER_ROLE.ADMINTEAM],
-            blockBy: 'RELATED',
+            blockBy: 'ROLE',
             blockRelation: 'FEDERATION',
             blockRelationId: 'id',
-            editUrl: '/app/clubes',
+            editUrl: '/clubes',
           },
           {
             type: 'DELETE',
             roles: [USER_ROLE.ADMIN],
             blockBy: 'ROLE',
             blockRelation: 'FEDERATION',
+            action: deleteTeamAction
           },
           {
             type: 'VIEW',
-            detailsUrl: '/app/clubes',
+            detailsUrl: '/clubes',
           },
         ]}
       />

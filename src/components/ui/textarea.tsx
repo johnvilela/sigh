@@ -6,9 +6,10 @@ import { Label } from "./label"
 interface TextareaProps extends React.ComponentProps<"textarea"> {
   label?: string;
   divClassName?: string;
+  error?: string;
 }
 
-function Textarea ({ className, divClassName, label, name, ...props }: TextareaProps) {
+function Textarea ({ className, divClassName, label, name, error, ...props }: TextareaProps) {
   return (
     <div className={classHelper('w-full max-w-sm', divClassName)}>
       {label && <Label htmlFor={name}>{label}</Label>}
@@ -22,6 +23,7 @@ function Textarea ({ className, divClassName, label, name, ...props }: TextareaP
         )}
         {...props}
       />
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
     </div>
   )
 }

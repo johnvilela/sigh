@@ -4,7 +4,7 @@ import { federationService } from '@/lib/modules/federation/federation-service';
 
 export default async function EditFederationPage ({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const federation = await federationService().getById({ id, includeTeams: true, includeAthletes: true });
+  const federation = await federationService().getById({ id });
 
   return (
     <ModuleLayout
