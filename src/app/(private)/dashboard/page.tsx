@@ -1,13 +1,15 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { deleteSessionAction } from '@/lib/modules/session/session-actions';
+import { ModuleLayout } from '@/components/ui/module-layout';
 
 export default function DashboardPage() {
   return (
-    <div>
+    <ModuleLayout
+      breadcrumbItems={[
+        { label: 'Dashboard', href: '/dashboard' },
+      ]}
+    >
       <h1>DASHBOARD</h1>
-      <Button onClick={() => deleteSessionAction()}>Logout</Button>
-    </div>
+    </ModuleLayout>
   );
 }

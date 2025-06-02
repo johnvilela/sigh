@@ -17,6 +17,7 @@ import { getValue } from '@/lib/utils/get-value';
 import { formatDictionary } from '@/lib/utils/format-dictionary';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './alert-dialog';
 import { ActionResponseType } from '@/lib/utils/action-response-builder';
+import { customFcDatalist } from '@/lib/utils/custom-fc-datalist';
 
 interface DataListProps {
   user: User;
@@ -48,10 +49,11 @@ interface DataListProps {
     name: string;
     headerClassname?: string;
     lineClassname?: string;
-    key: string | string[];
+    key?: string | string[];
     format?: keyof typeof formatDictionary;
     renderType?: 'BADGE';
     emptyValue?: string;
+    customFc?: keyof typeof customFcDatalist;
   }>;
   actions?: Array<{
     type: 'DELETE' | 'EDIT' | 'VIEW';
@@ -272,6 +274,23 @@ export function DataList ({
     }
   }
 
+  function renderTableCell (line: DataListProps['tableSettings'][number], obj: Record<string | number | symbol, unknown>) {
+    if (line.customFc) {
+      return customFcDatalist[line.customFc](obj);
+    }
+
+    if (line.key && typeof line.key !== 'string') {
+      return mountValueByArray(line.key, obj, line.format, line.emptyValue);
+    }
+
+    return renderSingleValue({
+      value: getValue(obj, line.key!, line.emptyValue),
+      formatter: line.format,
+      emptyValue: line.emptyValue,
+      renderType: line.renderType,
+    })
+  }
+
   return (
     <AlertDialog>
       <div className="flex flex-col md:flex-row md:justify-between gap-2 mb-8">
@@ -363,14 +382,7 @@ export function DataList ({
             <TableRow key={obj[lineKey] as string}>
               {tableSettings.map((line) => (
                 <TableCell className={line.lineClassname} key={`${obj[lineKey]}-${line.name}`}>
-                  {typeof line.key === 'string'
-                    ? renderSingleValue({
-                      value: getValue(obj, line.key, ''),
-                      formatter: line.format,
-                      emptyValue: line.emptyValue,
-                      renderType: line.renderType,
-                    })
-                    : mountValueByArray(line.key, obj, line.format, line.emptyValue)}
+                  {renderTableCell(line, obj)}
                 </TableCell>
               ))}
               <TableCell className="text-right w-40">

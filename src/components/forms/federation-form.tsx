@@ -90,7 +90,7 @@ export function FederationForm ({ federation, isEditing }: FederationFormProps) 
       )}
       <fieldset className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-8">
         <div className="md:col-span-4">
-          <legend className=" scroll-m-20 text-xl font-semibold">Dados da Federação</legend>
+          <legend className="scroll-m-20 text-xl font-semibold">Dados da Federação</legend>
         </div>
         <div className="md:col-span-1 h-24 md:h-full">
           <FileInput

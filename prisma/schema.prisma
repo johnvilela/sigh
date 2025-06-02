@@ -212,10 +212,11 @@ model PartnerProject {
   description         String
   initialDate         DateTime?
   finalDate           DateTime?
-  practitioners       Int
+  totalPractitioners  Int
   malePractitioners   Int
   femalePractitioners Int
-  ageGroup            String
+  ageGroupStart       Int
+  ageGroupEnd         Int
   contactName         String
   contactPhone        String
   federationId        String?
