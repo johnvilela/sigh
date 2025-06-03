@@ -6,20 +6,20 @@ import { z } from 'zod';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useAction } from 'next-safe-action/hooks';
-import { createUserAction } from '@/lib/modules/user/user-actions';
-import { CreateUserSchema } from '@/lib/modules/user/user-types';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { createAthleteAction } from '@/lib/modules/athlete/athlete-actions';
+import { CreateAthleteSchema } from '@/lib/modules/athlete/athlete-types';
 
 export function RegisterForm() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<z.infer<typeof CreateUserSchema>>({
-    resolver: zodResolver(CreateUserSchema),
+  } = useForm<z.infer<typeof CreateAthleteSchema>>({
+    resolver: zodResolver(CreateAthleteSchema),
   });
-  const { execute, isExecuting, result } = useAction(createUserAction);
+  const { execute, isExecuting, result } = useAction(createAthleteAction);
 
   return (
     <form className="flex flex-col gap-2 my-2" onSubmit={handleSubmit(execute)}>
