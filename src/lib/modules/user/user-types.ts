@@ -1,3 +1,4 @@
+import { USER_ROLE } from '@/generated/prisma';
 import { z } from 'zod';
 
 export const CreateUserSchema = z.object({
@@ -8,31 +9,25 @@ export const CreateUserSchema = z.object({
     .min(3)
     .max(255),
   email: z.string().email('Email inválido'),
-  document: z
+  federationId: z
     .string({
-      required_error: 'CPF é obrigatório',
+      required_error: 'Federação é obrigatória',
     })
-    .min(3)
-    .max(32),
-  birthDate: z
-    .string({
-      required_error: 'Data de nascimento é obrigatória',
-    })
-    .date(),
+    .uuid()
+    .optional(),
   teamId: z
     .string({
       required_error: 'Clube é obrigatório',
     })
     .uuid()
     .optional(),
-  password: z
-    .string({
-      required_error: 'Senha é obrigatória',
+  role: z
+    .enum([USER_ROLE.ADMIN, USER_ROLE.ADMINFEDERATION, USER_ROLE.ADMINTEAM, USER_ROLE.GOD], {
+      required_error: 'Função é obrigatória',
     })
-    .min(6)
-    .max(255),
+    .default(USER_ROLE.ADMINTEAM),
 });
 
-export type CreateUserDTO = Omit<z.infer<typeof CreateUserSchema>, 'password'> & {
+export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
   id?: string;
 };

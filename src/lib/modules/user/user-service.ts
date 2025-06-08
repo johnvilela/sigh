@@ -1,23 +1,22 @@
 import db from '@/lib/services/db';
 import { CreateUserDTO } from './user-types';
-import { USER_ROLE } from '@/generated/prisma';
-import dayjs from 'dayjs';
+
 
 export function userService () {
   return {
-    async create ({ birthDate, document, email, name, id }: CreateUserDTO) {
-      if (!birthDate || !document || !email || !name || !id) {
+    async create ({ email, name, role, federationId, teamId, id }: CreateUserDTO) {
+      if (!email || !name || !id || !role) {
         throw new Error('Todos os campos são obrigatórios');
       }
 
       const user = await db.user.create({
         data: {
           id,
-          birthDate: dayjs(birthDate).toDate(),
-          document,
           email,
           name,
-          role: USER_ROLE.ATHLETE,
+          role,
+          federationId: federationId ? federationId : undefined,
+          teamId: teamId ? teamId : undefined,
         },
       });
 
