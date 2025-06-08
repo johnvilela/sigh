@@ -57,6 +57,19 @@ model Session {
   @@map("sessions")
 }
 
+model Token {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  isValid   Boolean  @default(true)
+  expiresAt DateTime
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("tokens")
+}
+
 model User {
   id            String        @id
   email         String        @unique
@@ -74,6 +87,7 @@ model User {
   athlete       Athlete?
   approval      UserApproval?
   sessions      Session[]
+  tokens        Token[]
   credential    Credential?   @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   updatedAt     DateTime      @default(now()) @updatedAt
   createdAt     DateTime      @default(now())
