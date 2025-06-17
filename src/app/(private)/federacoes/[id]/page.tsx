@@ -84,7 +84,7 @@ export default async function FederationDetailsPage ({ params }: { params: Promi
                 {federation?.teams?.map((team) => (
                   <li key={team.id} className="w-full h-full">
                     <Link
-                      href={`/app/clubes/${team.id}`}
+                      href={`/clubes/${team.id}`}
                       className=" bg-background flex gap-2 w-full h-full p-4 md:border-r hover:brightness-95 duration-200"
                     >
                       <Image
@@ -112,7 +112,7 @@ export default async function FederationDetailsPage ({ params }: { params: Promi
                   .map((user) => (
                     <li key={user.id}>
                       <Link
-                        href={`/app/atleta/${user.id}`}
+                        href={`/atleta/${user.id}`}
                         className=" bg-background flex gap-2 p-4 md:border-r hover:brightness-95 duration-200 box-content"
                       >
                         <Image

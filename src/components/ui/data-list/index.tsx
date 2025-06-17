@@ -13,28 +13,28 @@ export interface EmptyMessage {
   description?: string;
 }
 
-export interface TableLine {
+export interface TableLine<T extends BaseDataItem> {
   key: string | string[];
   header: string;
   classname?: string;
   format?: keyof typeof formatDictionary;
   emptyValue?: string;
-  render?: (value: unknown) => React.ReactNode;
+  render?: (value: T) => React.ReactNode;
 }
 
 export interface DataListProps<T extends BaseDataItem> {
   lineKey: string;
   baseUrl: string;
-  table: Array<TableLine>
+  table: Array<TableLine<T>>
   caption?: string;
   emptyMessage?: EmptyMessage;
   action?: (obj: T) => React.ReactNode;
 }
 
 export function DataList<T extends BaseDataItem> ({ table, lineKey, caption, emptyMessage, action }: DataListProps<T>) {
-  const { data } = useDataListContext()
+  const { data = [] } = useDataListContext()
 
-  function defaultRender (tableLine: TableLine, obj: BaseDataItem) {
+  function defaultRender (tableLine: TableLine<T>, obj: BaseDataItem) {
     if (tableLine.key && typeof tableLine.key !== 'string') {
       return tableLine.key.reduce((acc, key, index) => {
         const value = getValue(obj, key, '');
@@ -81,7 +81,7 @@ export function DataList<T extends BaseDataItem> ({ table, lineKey, caption, emp
               <TableRow key={obj[lineKey] as string}>
                 {table.map((line) => (
                   <TableCell className={classHelper(line.classname)} key={`${obj[lineKey]}-${line.key}`}>
-                    {line.render?.(obj) ?? defaultRender(line, obj)}
+                    {line.render?.(obj as T) ?? defaultRender(line, obj)}
                   </TableCell>
                 ))}
                 <TableCell className="text-right w-40">

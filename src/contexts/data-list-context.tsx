@@ -30,7 +30,7 @@ export interface DataListContextProviderProps {
 
 const DataListContext = createContext({} as DataListContextData);
 
-export function DataListContextProvider ({ children, data, deleteFc, baseUrl, user }: DataListContextProviderProps) {
+export function DataListContextProvider ({ children, data = [], deleteFc, baseUrl, user }: DataListContextProviderProps) {
   const [optimisticDelete, setOptimisticDelete] = useState<string[]>([]);
   const [filter, setFilter] = useState<Record<string, string>>({});
   const searchParams = useSearchParams();

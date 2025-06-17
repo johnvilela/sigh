@@ -21,8 +21,8 @@ export default async function TeamDetailsPage ({ params }: { params: Promise<{ i
   return (
     <ModuleLayout
       breadcrumbItems={[
-        { label: 'Clubes', href: '/app/clubes' },
-        { label: team!.name!, href: `/app/clubes/${team!.id}` },
+        { label: 'Clubes', href: '/clubes' },
+        { label: team!.name!, href: `/clubes/${team!.id}` },
       ]}
     >
       <Card className='max-w-4xl mx-auto'>
@@ -62,7 +62,7 @@ export default async function TeamDetailsPage ({ params }: { params: Promise<{ i
                   .map((user) => (
                     <li key={user.id}>
                       <Link
-                        href={`/app/atleta/${user.id}`}
+                        href={`/atleta/${user.id}`}
                         className=" bg-background flex gap-2 p-4 md:border-r hover:brightness-95 duration-200 box-content"
                       >
                         <Image
