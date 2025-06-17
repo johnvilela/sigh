@@ -17,7 +17,7 @@ import Image from 'next/image';
 import { ReactElement } from 'react';
 import { MenuList } from './menu-list';
 import { User, USER_ROLE } from '@/generated/prisma';
-import { checkUserRole } from '@/lib/utils/check-user-role';
+import { validateUser } from '@/lib/utils/validate-user';
 import { MenuFooter } from './menu-footer';
 import { getLoggedUserAction } from '@/lib/modules/user/user-actions';
 
@@ -36,9 +36,9 @@ function MenuListData (user: User): MenuListDataType {
       { label: 'Federações', href: '/federacoes', icon: <Component /> },
     ],
   };
-  const isAthlete = checkUserRole([USER_ROLE.ATHLETE], user);
-  const isAdmin = checkUserRole([USER_ROLE.ADMIN], user);
-  const isManager = checkUserRole([USER_ROLE.ADMIN, USER_ROLE.ADMINFEDERATION, USER_ROLE.ADMINTEAM], user);
+  const isAthlete = validateUser(user).role([USER_ROLE.ATHLETE]);
+  const isAdmin = validateUser(user).role([USER_ROLE.ADMIN]);
+  const isManager = validateUser(user).role([USER_ROLE.ADMIN, USER_ROLE.ADMINFEDERATION, USER_ROLE.ADMINTEAM]);
 
   if (isAdmin) {
     base = {
