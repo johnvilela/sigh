@@ -11,8 +11,22 @@ import { tokenService } from '../token/token-service';
 
 export const mutateUserAction = actionClient
   .schema(MutateUserSchema)
-  .action(async ({ clientInput: { email, name, relatedId, role } }) => {
+  .action(async ({ clientInput: { email, name, relatedId, role, id } }) => {
     try {
+      if (id) {
+        await userService().update(id, {
+          email,
+          name,
+          relatedId,
+          role: USER_ROLE[role ?? 'ADMINTEAM'],
+        })
+
+        return actionResponseBuilder()
+          .success({
+            userId: id,
+          });
+      }
+
       const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
       const password = Array.from(crypto.getRandomValues(new Uint8Array(8)))
         .map(byte => charset[byte % charset.length])

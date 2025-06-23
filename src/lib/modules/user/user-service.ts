@@ -57,7 +57,7 @@ export function userService () {
         }
       });
     },
-    async update (id: string, data: Partial<MutateUserDTO>) {
+    async update (id: string, { email, name, relatedId, role }: Partial<MutateUserDTO>) {
       if (!id) {
         throw new Error('Usuário ID é obrigatório');
       }
@@ -71,9 +71,11 @@ export function userService () {
       const updatedUser = await db.user.update({
         where: { id },
         data: {
-          ...data,
-          federationId: data.role === USER_ROLE.ADMINFEDERATION ? data.relatedId : undefined,
-          teamId: data.role === USER_ROLE.ADMINTEAM ? data.relatedId : undefined,
+          name,
+          email,
+          role: USER_ROLE[role ?? 'ADMINTEAM'],
+          federationId: role === USER_ROLE.ADMINFEDERATION ? relatedId : undefined,
+          teamId: role === USER_ROLE.ADMINTEAM ? relatedId : undefined,
         }
       });
 
