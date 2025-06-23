@@ -1,3 +1,5 @@
+'use server';
+
 import { actionResponseBuilder } from "@/lib/utils/action-response-builder";
 import { redirect } from "next/navigation";
 import { sessionService } from "../session/session-service";
