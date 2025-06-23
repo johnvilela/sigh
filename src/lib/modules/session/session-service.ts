@@ -33,7 +33,10 @@ export function sessionService () {
       const expiresAt = dayjs(session.expiresAt);
 
       if (expiresAt.isBefore(now)) {
-        await db.session.delete({ where: { id } });
+        await db.session.update({
+          where: { id },
+          data: { isValid: false },
+        });
 
         throw new Error('Sessão expirada');
       }

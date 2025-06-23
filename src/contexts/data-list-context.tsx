@@ -37,7 +37,7 @@ export function DataListContextProvider ({ children, data = [], deleteFc, baseUr
   const router = useRouter();
 
   async function deleteItem (id: string) {
-    if (id) return;
+    if (!id) return;
 
     const res = await deleteFc(id);
 

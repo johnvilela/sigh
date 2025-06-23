@@ -1,5 +1,6 @@
 import { USER_STATUS } from '@/generated/prisma';
 import dayjs from 'dayjs';
+import { userRoleDictionary } from '../dictionary/user-roles-dictionary';
 
 export const formatDictionary = {
   DATE: (value: Date | string) => dayjs(value).format('DD/MM/YYYY'),
@@ -13,5 +14,8 @@ export const formatDictionary = {
       default:
         return 'Pendente';
     }
+  },
+  USER_ROLE: (value: string) => {
+    return userRoleDictionary[value as keyof typeof userRoleDictionary] || 'Desconhecido';
   },
 };

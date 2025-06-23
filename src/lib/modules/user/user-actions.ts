@@ -5,13 +5,13 @@ import { cookies } from 'next/headers';
 import { actionResponseBuilder } from '@/lib/utils/action-response-builder';
 import { credentialService } from '../credential/credential-service';
 import { userService } from './user-service';
-import { CreateUserSchema } from './user-types';
+import { MutateUserSchema } from './user-types';
 import { USER_ROLE } from '@/generated/prisma';
 import { tokenService } from '../token/token-service';
 
-export const createUserAction = actionClient
-  .schema(CreateUserSchema)
-  .action(async ({ clientInput: { email, name, teamId, federationId, role } }) => {
+export const mutateUserAction = actionClient
+  .schema(MutateUserSchema)
+  .action(async ({ clientInput: { email, name, relatedId, role } }) => {
     try {
       const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
       const password = Array.from(crypto.getRandomValues(new Uint8Array(8)))
@@ -22,25 +22,46 @@ export const createUserAction = actionClient
 
       const user = await userService().create({
         id: credential.id,
-        name: name,
-        email: email,
-        federationId: federationId,
-        teamId: teamId,
+        name,
+        email,
+        relatedId,
         role: USER_ROLE[role ?? 'ADMINTEAM'],
       });
 
       const token = await tokenService().create(user.id);
 
+      await userService().update(user.id, {
+        newPasswordId: token.id,
+      });
+
       return actionResponseBuilder()
         .success({
-          url: `${process.env.NEXT_PUBLIC_APP_URL}/mudar-senha?token=${token}`,
+          userId: user.id,
         })
     } catch (error) {
       if (error instanceof Error) {
         return actionResponseBuilder().error(error.message);
       }
+
+      return actionResponseBuilder().error('Erro ao criar usuário');
     }
   });
+
+export const deleteUserAction = async (id: string) => {
+  try {
+    console.log('Deleting user with ID:', id);
+
+    await userService().delete(id);
+
+    return actionResponseBuilder().success('Usuário deletado com sucesso');
+  } catch (error) {
+    if (error instanceof Error) {
+      return actionResponseBuilder().error(error.message);
+    }
+
+    return actionResponseBuilder().error('Erro ao deletar usuário');
+  }
+};
 
 export const getLoggedUserAction = async () => {
   const cookiesStore = await cookies();
@@ -53,7 +74,7 @@ export const getLoggedUserAction = async () => {
     return null;
   }
 
-  const user = await userService().findOne(userId);
+  const user = await userService().findOne({ id: userId });
 
   if (!user) {
     return null;

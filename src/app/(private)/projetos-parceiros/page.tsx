@@ -27,8 +27,6 @@ export default async function PartnerProjectPage ({ searchParams }: { searchPara
   });
   const user = await getLoggedUserAction();
 
-  console.log(partnerProjects)
-
   return (
     <ModuleLayout breadcrumbItems={[{ label: 'Projetos parceiros', href: '/projetos-parceiros' }]}>
       <DataListContextProvider

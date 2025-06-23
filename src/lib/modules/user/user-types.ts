@@ -1,7 +1,26 @@
+
 import { USER_ROLE } from '@/generated/prisma';
 import { z } from 'zod';
 
-export const CreateUserSchema = z.object({
+export interface IFindOneUsersParams {
+  id: string;
+  includeFederation?: boolean;
+  includeTeam?: boolean;
+}
+
+export interface IFindAllUsersParams {
+  role?: USER_ROLE[];
+  includeFederation?: boolean;
+  includeTeam?: boolean;
+  filters?: {
+    name?: string;
+    federationId?: string;
+    teamId?: string;
+  };
+}
+
+export const MutateUserSchema = z.object({
+  id: z.string().optional(),
   name: z
     .string({
       required_error: 'Nome é obrigatório',
@@ -9,25 +28,16 @@ export const CreateUserSchema = z.object({
     .min(3)
     .max(255),
   email: z.string().email('Email inválido'),
-  federationId: z
+  relatedId: z
     .string({
-      required_error: 'Federação é obrigatória',
+      required_error: 'Usuário não está relacionado a nada',
     })
     .uuid()
     .optional(),
-  teamId: z
-    .string({
-      required_error: 'Clube é obrigatório',
-    })
-    .uuid()
-    .optional(),
-  role: z
-    .enum([USER_ROLE.ADMIN, USER_ROLE.ADMINFEDERATION, USER_ROLE.ADMINTEAM, USER_ROLE.GOD], {
-      required_error: 'Função é obrigatória',
-    })
-    .default(USER_ROLE.ADMINTEAM),
+  role: z.enum([USER_ROLE.ADMIN, USER_ROLE.ADMINFEDERATION, USER_ROLE.ADMINTEAM, USER_ROLE.GOD]),
+  newPasswordId: z.string().optional(),
 });
 
-export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
+export type MutateUserDTO = z.infer<typeof MutateUserSchema> & {
   id?: string;
 };

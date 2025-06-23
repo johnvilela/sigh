@@ -7,7 +7,7 @@ import { partnerProjectService } from "@/lib/modules/partner-project/partner-pro
 import dayjs from "dayjs";
 import { MapPin, Phone, Users } from "lucide-react";
 
-export default async function EditPartnerProjectPage ({ params }: { params: Promise<{ id: string }> }) {
+export default async function PartnerProjectDetailsPage ({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const partnerProject = await partnerProjectService().getById({ id, includeFederation: true, includeTeam: true });
 

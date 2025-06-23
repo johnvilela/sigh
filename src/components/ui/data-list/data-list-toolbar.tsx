@@ -26,7 +26,10 @@ export function DataListToolbar ({ filters, createBtn }: DataListToolbarProps) {
 
   return (
     <div className="flex flex-col md:flex-row md:justify-between gap-2 mb-8">
-      <div className="flex flex-1 gap-2">
+      <form className="flex flex-1 gap-2" onSubmit={(e) => {
+        e.preventDefault();
+        search()
+      }}>
         {filters &&
           filters.map((f) => {
             if (f.type === 'text') {
@@ -71,7 +74,7 @@ export function DataListToolbar ({ filters, createBtn }: DataListToolbarProps) {
           })}
 
         <div>
-          <Button size="icon" variant="outline" onClick={() => search()}>
+          <Button type='submit' size="icon" variant="outline">
             <Search />
           </Button>
         </div>
@@ -82,7 +85,7 @@ export function DataListToolbar ({ filters, createBtn }: DataListToolbarProps) {
             </Button>
           </div>
         }
-      </div>
+      </form>
       {
         createBtn && (
           <div>

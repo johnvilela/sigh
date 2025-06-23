@@ -49,7 +49,8 @@ model Credential {
 model Session {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  isValid   Boolean  @default(true)
   expiresAt DateTime
   updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
@@ -60,7 +61,7 @@ model Session {
 model Token {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   token     String   @unique
   isValid   Boolean  @default(true)
   expiresAt DateTime
@@ -77,6 +78,7 @@ model User {
   role          USER_ROLE
   status        USER_STATUS   @default(ACTIVE)
   isTransfering Boolean       @default(false)
+  newPasswordId String?
   photoUrl      String?
   teamId        String?
   federationId  String?
