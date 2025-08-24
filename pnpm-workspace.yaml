@@ -1,0 +1,10 @@
+packages:
+  - back
+  - front
+  - shared
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@swc/core'
+  - esbuild
+  - unrs-resolver
